@@ -50,7 +50,8 @@ static DEFINE_SPINLOCK(hotplug_lock);
 #else
 static spinlock_t hotplug_lock = SPIN_LOCK_UNLOCKED;
 #endif
-static int hotplug_initialized;
+static volatile int hotplug_initialized;
+static volatile int hotplug_registering;  // Prevents concurrent cpuhp_setup_state calls
 static LIST_HEAD(notify_list);
 
 struct kfio_cpu_notify
@@ -92,6 +93,7 @@ int kfio_register_cpu_notifier(kfio_cpu_notify_fn *func)
 #ifdef CONFIG_SMP
     struct kfio_cpu_notify *kcn;
     int do_register = 0;
+    int ret;
 
     kcn = kmalloc(sizeof(*kcn), GFP_KERNEL);
     if (!kcn)
@@ -101,34 +103,55 @@ int kfio_register_cpu_notifier(kfio_cpu_notify_fn *func)
     kcn->func = func;
     list_add_tail(&kcn->list, &notify_list);
 
-    if (!hotplug_initialized)
+    if (!hotplug_initialized && !hotplug_registering)
     {
         do_register = 1;
-        hotplug_initialized = 1;
+        hotplug_registering = 1;  // Prevent concurrent registration attempts
     }
     spin_unlock(&hotplug_lock);
 
     if (do_register)
     {
-        // Fancy footwork to handle various kernel idiosyncracies...
-        // Kernels less than 4.8 only use register_cpu_notifier().
-        // Kernel 4.8 provides both register_cpu_notifier() and a new function cpuhp_setup_state() for setting
-        //  a callback for a cpu coming online. However, our notifier/callback function requires a lower hotplug state
-        //  than the provided CPUHP_AP_ONLINE_DYN to work without modification (log messages are wrong).
-        //  So we use cpuhp_setup_state() for setting an 'online' callback but use the old register_cpu_notifier()
-        //  for 'offline'.
-        // Kernel 4.10 and above have symmetrical CPUHP_..._DYN states for online and offline callbacks.
-        // Whether kernel has states removal bug or not, now setup our real callback.
-        cpuhp_offline_dyn_state =
-        cpuhp_setup_state_nocalls(CPUHP_BP_PREPARE_DYN,
-                                   "block/iomemory_vsl4:offline",
-                                   NULL,
-                                   kfio_cpu_notify_offline);
-        cpuhp_online_dyn_state =
-        cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
-                                  "block/iomemory_vsl4:online",
-                                  kfio_cpu_notify_online,
-                                  NULL);
+        // Setup CPU hotplug state callbacks for online/offline notifications.
+        // Kernel 4.10+ has symmetrical CPUHP_..._DYN states for both directions.
+        ret = cpuhp_setup_state_nocalls(CPUHP_BP_PREPARE_DYN,
+                                        "block/iomemory_vsl4:offline",
+                                        NULL,
+                                        kfio_cpu_notify_offline);
+        if (ret < 0)
+        {
+            // Cleanup on failure
+            spin_lock(&hotplug_lock);
+            list_del(&kcn->list);
+            hotplug_registering = 0;
+            spin_unlock(&hotplug_lock);
+            kfree(kcn);
+            return ret;
+        }
+        cpuhp_offline_dyn_state = ret;
+
+        ret = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
+                                        "block/iomemory_vsl4:online",
+                                        kfio_cpu_notify_online,
+                                        NULL);
+        if (ret < 0)
+        {
+            // Cleanup on failure - remove offline state and free kcn
+            cpuhp_remove_state_nocalls(cpuhp_offline_dyn_state);
+            spin_lock(&hotplug_lock);
+            list_del(&kcn->list);
+            hotplug_registering = 0;
+            spin_unlock(&hotplug_lock);
+            kfree(kcn);
+            return ret;
+        }
+        cpuhp_online_dyn_state = ret;
+
+        // Mark initialization complete after successful setup
+        spin_lock(&hotplug_lock);
+        hotplug_initialized = 1;
+        hotplug_registering = 0;
+        spin_unlock(&hotplug_lock);
     }
 #endif  /* CONFIG_SMP */
     return 0;

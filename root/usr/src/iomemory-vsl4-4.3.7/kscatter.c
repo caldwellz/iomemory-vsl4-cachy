@@ -438,10 +438,8 @@ int kfio_sgl_dma_map(kfio_sg_list_t *sgl, kfio_dma_cookie_t *_cookie, kfio_dma_m
     for (i = 0; i < lsg->num_entries; i++)
     {
         struct linux_sgentry *sge;
-        struct scatterlist *sl;
 
         sge = &lsg->sge[i];
-        sl = &lsg->sl[i];
 
         if (dir == IODRIVE_DMA_DIR_READ)
         {
@@ -483,16 +481,7 @@ int kfio_sgl_dma_unmap(kfio_sg_list_t *sgl, kfio_dma_cookie_t *_cookie)
 {
     struct linux_sgl *lsg = sgl;
     struct linux_dma_cookie *cookie = (struct linux_dma_cookie *)_cookie;
-    int i;
 
-    for (i = 0; i < lsg->num_mapped; i++)
-    {
-        struct linux_sgentry *sge;
-        struct scatterlist *sl;
-
-        sge = &lsg->sge[i];
-        sl = &lsg->sl[i];
-    }
     dma_unmap_sg(&cookie->pci_dev->dev, lsg->sl, lsg->num_entries,
                  cookie->pci_dir == IODRIVE_DMA_DIR_READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE);
     lsg->num_mapped = 0;

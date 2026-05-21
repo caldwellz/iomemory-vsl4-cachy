@@ -37,7 +37,7 @@ all supply newer kernels than supported.
 Driver support for FusionIO cards had been lagging behind kernel releases, effectively making these cards an expensive paperweight when running a distribution like Ubuntu / Arch / Fedora / ProxMox which all supply newer kernels than supported by the original drivers.
 
 ## Releases
-We've abandoned the notion of releases, Generally `main` should be checked out. `main` is completely backwards compatible for all **5**, **6** and **7** kernels. The latest working tested kernel is **7.0.4**.
+We've abandoned the notion of releases, Generally `main` should be checked out. `main` is completely backwards compatible for all **5**, **6** and **7** kernels. The latest working tested kernel is **7.0.5**.
 
 ## Important Note for newer Linux Kernels
 Starting with Linux kernel 5.4.0, significant changes to the kernel were made that require additional boot time kernel flags for this driver to work. These affect AMD CPUs starting with 5.4.0, and Intel CPUs after about kernel 5.8.0. 
@@ -102,6 +102,12 @@ Note! For many systems, **the best option is to use DKMS**, using the [DKMS inst
 
 Please make sure that the required dependencies are installed, as mentioned in this [README](https://github.com/RemixVSL/iomemory-vsl4/blob/main/README)
 
+### Building with LLVM / Clang
+Some distribution kernels (e.g. CachyOS LTO variants) are built with `clang`
+instead of `gcc`, in which case you'll need to add `LLVM=1` to the relevant
+make command, i.e. `make LLVM=1 dkms` or `make LLVM=1 module` (`dkms`, `module`,
+and `clean` are the only targets supporting LLVM for now).
+
 ## Installation
 DKMS is recommended, but installation can also be done with packages or from source.
 
@@ -110,7 +116,7 @@ Dynamic Kernel Module Support automates away the requirement of having to
 repackage the kernel module with every kernel and headers update that takes
 place on the system.
 
-Try building from `main` first as it works with most modern kernels up to about 5.14:
+Try building from `main` first as it works with most modern kernels:
 
 ```
 git clone https://github.com/snuf/iomemory-vsl4

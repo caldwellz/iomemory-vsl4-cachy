@@ -530,6 +530,7 @@ void kfio_info_os_remove_node(kfio_info_node_t *parent, kfio_info_node_t *nodep)
     fusion_proc_dir_entry *node_entry;
     const char *node_name;
     int         node_type;
+    (void)node_type; // Avoid an unused-but-set-variable warning when the kassert is compiled out
 
     node_name  = kfio_info_node_get_name(nodep);
     node_type  = kfio_info_node_get_type(nodep);

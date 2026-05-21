@@ -133,7 +133,7 @@ void kfioc_blk_mq_f_should_merge(void)
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BLK_ALLOC_DISK_HAS_QUEUE_LIMITS
@@ -158,7 +158,7 @@ void kfioc_check_blk_alloc_disk_has_queue_limits(void)
     gd = blk_alloc_disk(lim, node_id);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_HANDLE_SYSRQ_IS_U8
@@ -171,10 +171,10 @@ KFIOC_X_HANDLE_SYSRQ_IS_U8()
     local test_code='
 #include <linux/sysrq.h>
 
+static void t_handle_sysreq(u8 key) {};
 void kfioc_check_handle_sysrq_is_u8(void);
 void kfioc_check_handle_sysrq_is_u8(void)
 {
-    void t_handle_sysreq(u8 key) {};
     struct sysrq_key_op t_key_op = {
         .handler = t_handle_sysreq,
         .help_msg = "ioDrive CSR (z)",
@@ -186,7 +186,7 @@ void kfioc_check_handle_sysrq_is_u8(void)
     unregister_sysrq_key(key, &t_key_op);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BDOPS_OPEN_GENDISK_AND_BLK_MODE_T
@@ -209,7 +209,7 @@ void kfioc_check_bdops_open_is_disk(void)
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 
@@ -232,7 +232,7 @@ void kfioc_check_bdops(void)
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 
@@ -253,7 +253,7 @@ void kfioc_check_caps_pde_data(void)
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BIO_SPLIT_TO_LIMITS
@@ -274,7 +274,7 @@ void kfioc_check_bio_split_to_limits(void)
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_SUBMIT_BIO_RETURNS_BLK_QC_T
@@ -295,7 +295,7 @@ void kfioc_check_submit_bio_returns_blk_qc_t(void)
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_VOID_ADD_DISK
@@ -311,11 +311,11 @@ int kfioc_check_void_add_disk(void);
 int kfioc_check_void_add_disk(void)
 {
   struct gendisk *gd = NULL;
-  return add_disk(gd)
+  return add_disk(gd);
 }
 
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_DISK_HAS_OPEN_MUTEX
@@ -338,7 +338,7 @@ void kfioc_check_disk_open_mutex(void)
   open_mutex = gd->open_mutex;
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BLK_ALLOC_DISK_EXISTS
@@ -360,7 +360,7 @@ void kfioc_check_blk_alloc_disk(void)
   gd = blk_alloc_disk(node);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BIO_HAS_BI_BDEV
@@ -382,7 +382,7 @@ void kfioc_bio_has_bi_bdev(void)
   set_disk_ro(disk, 1);
  }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_GENHD_PART0_IS_A_POINTER
@@ -404,7 +404,7 @@ void kfioc_genhd_part0_is_a_pointer(void)
   part_stat_set_all(gd->part0, 0);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_HAS_MAKE_REQUEST_FN
@@ -425,7 +425,7 @@ void kfioc_has_make_request_fn(void)
   };
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BLK_ALLOC_QUEUE_NODE_EXISTS
@@ -447,7 +447,7 @@ void kfioc_check_blk_alloc_queue_node(void)
   rq = blk_alloc_queue_node(GFP_NOIO, node);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:            KFIOC_X_BLK_ALLOC_QUEUE_EXISTS
@@ -468,7 +468,7 @@ void kfioc_check_blk_alloc_queue(void)
   rq = blk_alloc_queue(node);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 ####
@@ -488,7 +488,7 @@ void kfioc_check_task_has_cpus_mask(void)
     tsk->cpus_mask = *cpu_mask;
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 -Werror
+    kfioc_test "$test_code" "$test_flag" 1 -Wno-unused-but-set-variable -Werror
 }
 
 # flag:           KFIOC_X_PROC_CREATE_DATA_WANTS_PROC_OPS
@@ -513,7 +513,7 @@ void *kfioc_has_proc_create_data(struct inode *inode)
     return proc_create_data(NULL, 0, NULL, pops, NULL);
 }
 '
-    kfioc_test "$test_code" "$test_flag" 1 "-Werror-implicit-function-declaration -Werror"
+    kfioc_test "$test_code" "$test_flag" 1 "-Werror-implicit-function-declaration -Wno-unused-but-set-variable -Werror"
 }
 
 #
@@ -668,7 +668,7 @@ else
 all: modules
 
 modules clean:
-	\$(MAKE) -C \$(KERNEL_SRC) M=\$(CURDIR) EXTRA_CFLAGS='-Wall ${extra_cflags}' \$@
+	\$(MAKE) -C \$(KERNEL_SRC) M=\$(CURDIR) LLVM=\$(LLVM) EXTRA_CFLAGS='-Wall ${extra_cflags}' \$@
 
 endif
 
@@ -862,9 +862,9 @@ MODULE_LICENSE(\"GPL\");
     echo "$license" >> "$test_dir/kfioc_test.c"
 
     if [ 1 -eq "$VERBOSE" ]; then
-        env -i PATH="${PATH}" make -C "$test_dir" V=1 2>&1 | tee "$test_dir/kfioc_test.log" || result=$?
+        env -i PATH="${PATH}" make -C "$test_dir" LLVM=${LLVM} V=1 2>&1 | tee "$test_dir/kfioc_test.log" || result=$?
     else
-        env -i PATH="${PATH}" make -C "$test_dir" V=1 >"$test_dir/kfioc_test.log" 2>&1 || result=$?
+        env -i PATH="${PATH}" make -C "$test_dir" LLVM=${LLVM} V=1 >"$test_dir/kfioc_test.log" 2>&1 || result=$?
     fi
 
     # Save the exit status
@@ -979,6 +979,7 @@ main()
 
     cat <<EOF
 Detecting Kernel Flags
+LLVM               : ${LLVM}
 Config dir         : ${CONFIGDIR}
 Output file        : ${OUTPUTFILE}
 Kernel output dir  : ${KERNELDIR}

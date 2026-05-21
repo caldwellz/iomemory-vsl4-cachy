@@ -153,7 +153,10 @@ void *noinline kfio_inode_data(fusion_inode *ip)
 */
 int noinline kfio_single_open(fusion_file *fp, int (*show_proc)(fusion_seq_file *, void *), void *data)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type-strict"
     return single_open(fp, (int (*)(struct seq_file *, void *))show_proc, data);
+#pragma GCC diagnostic pop
 }
 
 /**

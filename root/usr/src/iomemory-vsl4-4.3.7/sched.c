@@ -39,6 +39,8 @@
 C_ASSERT(sizeof(struct fusion_work_struct) >= sizeof(struct delayed_work));
 C_ASSERT(sizeof(struct fusion_work_struct) >= sizeof(struct work_struct));
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type-strict"
 void noinline fusion_setup_dpc(fusion_dpc_t *wq, fusion_work_func_t func)
 {
     INIT_WORK((struct work_struct *) wq, (work_func_t) func);
@@ -110,6 +112,7 @@ void noinline fusion_might_sleep(void)
 {
     might_sleep();
 }
+#pragma GCC diagnostic pop
 
 /**
  * @}

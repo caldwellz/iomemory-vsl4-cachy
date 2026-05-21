@@ -600,7 +600,7 @@ static void kfio_blk_add_disk(fusion_work_struct_t *work)
     struct kfio_blk_add_disk_param *param = container_of(work, struct kfio_blk_add_disk_param, work);
     struct kfio_disk *disk = param->disk;
 
-    ADD_DISK
+    (void) ADD_DISK
 
     /* Tell waiter we are done. */
     fusion_cv_lock_irq(&disk->state_lk);
@@ -1076,6 +1076,7 @@ static void kfio_bio_completor(struct kfio_bio *fbio, uint64_t bytes_complete, i
 {
     struct bio *bio = (struct bio *)fbio->fbio_parameter;
     uint64_t bytes_completed = 0;
+    (void)bytes_completed; // Avoid an unused-but-set-variable warning when the kassert is compiled out
 
     if (unlikely(fbio->fbio_flags & KBIO_FLG_DUMP))
     {
@@ -1303,6 +1304,7 @@ static void fusion_handle_atomic_chain_completor(struct kfio_bio *fbio,
 {
     struct bio *bio = (struct bio *)fbio->fbio_parameter;
     uint64_t bytes_completed = 0;
+    (void)bytes_completed; // Avoid an unused-but-set-variable warning when the kassert is compiled out
 
     /*
      * we pull the atomic ctx out of the fbio parameter and then our bio chain
@@ -1668,16 +1670,11 @@ static void linux_bdev_backpressure(struct fio_bdev *bdev, int on)
 void linux_bdev_lock_pending(struct fio_bdev *bdev, int pending)
 {
     struct kfio_disk *disk = bdev->bdev_gd;
-    struct gendisk *gd;
-    struct request_queue *q;
 
     if (disk == NULL || disk->gd == NULL || disk->gd->queue == NULL)
     {
         return;
     }
-
-    gd = disk->gd;
-    q = gd->queue;
 
     if (pending)
     {
@@ -1694,7 +1691,6 @@ void linux_bdev_lock_pending(struct fio_bdev *bdev, int pending)
         if (atomic_dec_return(&disk->lock_pending) > 0)
         {
             atomic_set(&disk->lock_pending, 0);
-
         }
     }
 }

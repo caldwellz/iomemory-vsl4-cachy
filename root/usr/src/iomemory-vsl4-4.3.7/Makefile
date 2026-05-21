@@ -93,7 +93,7 @@ clean modules_clean:
 	rm -rf include/fio/port/linux/kfio_config.h kfio_config
 
 include/fio/port/linux/kfio_config.h: kfio_config.sh
-	./$< -a $(FIOARCH) -o $@ -k $(KERNEL_BUILD) -p -d $(CURDIR)/kfio_config -l $(FUSION_DEBUG) -s $(KERNEL_SRC)
+	env LLVM=$(LLVM) ./$< -a $(FIOARCH) -o $@ -k $(KERNEL_BUILD) -p -d $(CURDIR)/kfio_config -l $(FUSION_DEBUG) -s $(KERNEL_SRC)
 
 .PHONY: check_target_kernel
 check_target_kernel:

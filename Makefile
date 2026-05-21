@@ -8,7 +8,7 @@ all: help
 .PHONY: dkms
 dkms: clean
 	cd ${FIO_SRC_DIR} && \
-		$(MAKE) dkms
+		$(MAKE) LLVM=$(LLVM) dkms
 
 .PHONY: dpkg
 dpkg: clean patch_module_version
@@ -29,7 +29,7 @@ rpm: clean patch_module_version
 .PHONY: module
 module: clean
 	cd ${FIO_SRC_DIR} && \
-  		$(MAKE) gpl
+  		$(MAKE) LLVM=$(LLVM) gpl
 
 clean:
 	cd ${FIO_SRC_DIR} && \

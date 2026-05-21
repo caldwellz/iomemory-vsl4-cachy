@@ -135,7 +135,7 @@ int kfio_strncmp(const char *s1, const char *s2, fio_size_t n)
 
 char *kfio_strncpy(char *dst, const char *src, fio_size_t n)
 {
-    strlcpy(dst, src, n);
+    strncpy(dst, src, n);
     return dst;
 }
 
